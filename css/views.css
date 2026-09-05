@@ -369,24 +369,43 @@
 }
 .subtask-input:focus { border-style: solid; border-color: var(--primary); background: rgba(8, 11, 20, 0.6); }
 
-/* Timeline y Notas */
-.timeline { position: relative; margin-top: 0.8rem; padding-left: 1.1rem; }
+/* Timeline y Notas con scroll independiente */
+.timeline {
+  position: relative;
+  margin-top: 0.8rem;
+  padding-left: 1.25rem;
+  padding-right: 0.4rem;
+  padding-bottom: 0.6rem;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) rgba(8, 11, 20, 0.4);
+}
+
 .timeline::before {
   content: '';
   position: absolute;
-  left: 3px; top: 5px; bottom: 5px;
+  left: 4px;
+  top: 5px;
+  bottom: 5px;
   width: 1px;
   background: var(--border-focus);
 }
-.timeline-item { position: relative; margin-bottom: 0.1rem; }
+
+.timeline-item { position: relative; margin-bottom: 0.4rem; }
 .timeline-item:last-child { margin-bottom: 0; }
+
 .timeline-dot {
   position: absolute;
-  left: -1.1rem; top: 5px;
-  width: 7px; height: 7px;
+  left: -1.25rem;
+  top: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--accent);
 }
+
 .timeline-entry {
   background: rgba(8, 11, 20, 0.5);
   border: 1px solid var(--border);
@@ -402,7 +421,51 @@
   word-break: break-word;
 }
 
-.notes-grid { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.5rem; }
+.notes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.4rem;
+  padding-bottom: 0.6rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) rgba(8, 11, 20, 0.4);
+}
+
+/* Scrollbars temáticos para Timeline, Notas y Modal de Notas */
+.timeline::-webkit-scrollbar,
+.notes-grid::-webkit-scrollbar,
+.note-textarea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.timeline::-webkit-scrollbar-track,
+.notes-grid::-webkit-scrollbar-track,
+.note-textarea::-webkit-scrollbar-track {
+  background: rgba(8, 11, 20, 0.3);
+  border-radius: 999px;
+  margin: 4px 0;
+}
+
+.timeline::-webkit-scrollbar-thumb,
+.notes-grid::-webkit-scrollbar-thumb,
+.note-textarea::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 999px;
+  box-shadow: 0 0 6px var(--theme-soft-bg);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.timeline::-webkit-scrollbar-thumb:hover,
+.notes-grid::-webkit-scrollbar-thumb:hover,
+.note-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
 .note-preview-card {
   background: rgba(8, 11, 20, 0.5);
   border: 1px solid var(--border);
@@ -451,12 +514,31 @@
   font-size: 0.65rem;
 }
 
+/* Botón de eliminación rápida en la tarjeta de nota */
+.note-quick-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+.note-quick-delete-btn:hover {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--danger) !important;
+}
+
 /* Modales */
 .note-panel-card { max-width: 740px; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
 .modal-header h3 { color: var(--text) !important; }
 .modal-header-actions { display: flex; align-items: center; gap: 0.5rem; }
 .shortcut-tip { font-size: 0.7rem; color: var(--text-muted) !important; }
+
+/* Textarea de Notas con scroll temático espacial */
 .note-textarea {
   min-height: 250px;
   line-height: 1.55;
@@ -467,7 +549,10 @@
   border-radius: 7px;
   color: #f1f5f9 !important;
   resize: vertical;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) rgba(8, 11, 20, 0.4);
 }
+
 #btn-note-important.active {
   background: var(--primary);
   border-color: var(--primary);
@@ -545,6 +630,13 @@
   flex-direction: column;
   gap: 0.45rem;
 }
+.test-thread-form.form-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  filter: grayscale(0.6);
+  border-style: dashed;
+}
+
 .subthread-title-highlight { font-size: 0.75rem; font-weight: 600; color: var(--accent) !important; word-break: break-word; }
 .panel-description { font-size: 0.72rem; color: var(--text-muted) !important; line-height: 1.45; word-break: break-word; }
 
@@ -727,12 +819,4 @@ input[type="range"] {
 #log-input {
   resize: vertical;
   max-width: 100%;
-}
-
-/* Subpanel de pruebas deshabilitado cuando el testing está cerrado */
-.test-thread-form.form-disabled {
-  opacity: 0.45;
-  pointer-events: none;
-  filter: grayscale(0.6);
-  border-style: dashed;
 }

@@ -68,6 +68,43 @@
 }
 .btn-danger-ghost:hover { color: var(--danger) !important; }
 
+/* Botón Danger */
+.btn-danger {
+  background-color: var(--danger);
+  color: #ffffff !important;
+  border: 1px solid transparent;
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: #e11d48;
+}
+
+/* Modales de Confirmación y Alerta */
+.confirm-modal-card,
+.alert-modal-card {
+  min-width: 320px !important;
+  max-width: 480px !important;
+  width: 90vw !important;
+}
+
+.modal-dialog-message {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 1.1rem;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
 /* Inputs, Textareas y Selects */
 input, textarea, select {
   width: 100%;

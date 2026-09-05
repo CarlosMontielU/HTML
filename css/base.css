@@ -9,46 +9,14 @@
 
 html {
   font-size: 20px;
-  background-color: var(--bg); /* Sirve como fallback estático antes de que cargue el canvas */
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) rgba(8, 11, 20, 0.7);
-}
-
-/* === ESTÉTICA ESPACIAL: SCROLLBAR GLOBAL === */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(5, 7, 14, 0.85);
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--primary), var(--primary-hover));
-  border-radius: 999px;
-  border: 2px solid rgba(5, 7, 14, 0.85);
-  box-shadow: 0 0 10px var(--theme-soft-bg);
-  transition: all 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
-  box-shadow: 0 0 14px var(--accent);
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* Asegura que el atributo 'hidden' siempre tenga prioridad absoluta */
-[hidden] {
-  display: none !important;
+  background-color: var(--bg);
+  /* Ocultar barra de scroll en Firefox e Internet Explorer/Edge antiguo */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 body {
-  background-color: transparent; /* <-- CAMBIAR: permite ver el canvas animado */
+  background-color: transparent;
   color: var(--text);
   min-height: 100vh;
   display: flex;
@@ -56,12 +24,24 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
+  /* Garantizar scroll invisible en Firefox */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Ocultar barra de scroll general en Chrome, Safari, Opera y Edge moderno */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
 }
 
 #space-canvas {
   position: fixed;
   inset: 0;
-  width: 100%;       /* Mejor 100% que 100vw para evitar saltos con el scrollbar vertical */
+  width: 100%;
   height: 100%;
   z-index: -1;
   pointer-events: none;
@@ -90,6 +70,11 @@ body {
   max-width: 95vw;
   margin: 0 auto;
   padding: 1.2rem 1.26rem 4rem;
+}
+
+/* Asegura que el atributo 'hidden' siempre tenga prioridad absoluta */
+[hidden] {
+  display: none !important;
 }
 
 .visually-hidden {

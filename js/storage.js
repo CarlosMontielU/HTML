@@ -114,7 +114,12 @@ window.Playground = window.Playground || {};
       try {
         localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
       } catch (e) {
-        alert('Advertencia: Almacenamiento lleno. No se pudieron guardar los cambios.');
+        if (window.Playground.utils && window.Playground.utils.showAlert) {
+          window.Playground.utils.showAlert({
+            title: 'Almacenamiento lleno',
+            message: 'No se pudieron guardar los cambios en el navegador.'
+          });
+        }
       }
     },
 

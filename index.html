@@ -52,7 +52,7 @@
 
           <form id="form-add-feature" class="inline-form">
             <input type="text" id="feature-input" placeholder="Añadir funcionalidad..." required>
-            <button type="submit" class="btn btn-secondary" aria-label="Agregar">+</button>
+            <button type="submit" class="btn" aria-label="Agregar">+</button>
           </form>
 
           <!-- Subgrupo Pendientes (Desplegable) -->
@@ -89,7 +89,7 @@
           <form id="form-add-log" class="timeline-form">
             <textarea id="log-input" rows="2" placeholder="Registrar avance o cambio..." required></textarea>
             <div class="form-actions-right">
-              <button type="submit" class="btn btn-secondary" aria-label="Publicar avance">+</button>
+              <button type="submit" class="btn" aria-label="Publicar avance">+</button>
             </div>
           </form>
           <div id="timeline-container" class="timeline"></div>
@@ -324,6 +324,29 @@
 
       <footer class="modal-actions border-top">
         <button type="button" class="btn btn-secondary" id="btn-done-testing">Listo</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- MODAL: CONFIRMACIÓN PERSONALIZADO -->
+  <dialog class="app-modal" id="modal-confirm">
+    <div class="modal-card confirm-modal-card">
+      <h3 id="confirm-modal-title">Confirmar acción</h3>
+      <p id="confirm-modal-message" class="modal-dialog-message"></p>
+      <footer class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-ok">Confirmar</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- MODAL: AVISO / ALERTA PERSONALIZADO -->
+  <dialog class="app-modal" id="modal-alert">
+    <div class="modal-card alert-modal-card">
+      <h3 id="alert-modal-title">Aviso</h3>
+      <p id="alert-modal-message" class="modal-dialog-message"></p>
+      <footer class="modal-actions">
+        <button type="button" class="btn" id="btn-alert-ok">Entendido</button>
       </footer>
     </div>
   </dialog>

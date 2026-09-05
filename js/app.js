@@ -1,6 +1,6 @@
 (function() {
   const { EVENT_TYPE_MAP } = window.Playground;
-  const { escapeHtml, generateId, getFormattedDate } = window.Playground.utils;
+  const { escapeHtml, generateId, getFormattedDate, showConfirm, showAlert } = window.Playground.utils;
   const { loadProjects, saveProjects } = window.Playground.storage;
   const { SpaceBackground, WorkspaceSplitter, ThemeManager } = window.Playground;
 
@@ -101,7 +101,6 @@
     ensureFeatureStructure(feat);
     const subtasks = feat.subtasks || [];
 
-    // Si ya está aprobado y cerrado en el hilo general, se conserva
     if (feat.testing.status === 'passed') {
       return;
     }
@@ -201,13 +200,11 @@
     }
   }
 
-  // Función unificada para reabrir el testing y publicar en el hilo de avances
   function reopenTesting(feat, project, customLogMessage = null) {
     feat.testing.status = 'in_progress';
     feat.created = false;
     const formattedDate = getFormattedDate();
 
-    // 1. Registro automático en el Hilo General de Testing
     feat.testing.generalThread.unshift({
       id: generateId('gen-reopen-'),
       type: 'started',
@@ -217,7 +214,6 @@
       isAuto: true
     });
 
-    // 2. Registro obligatorio en el Hilo de Avances (Timeline)
     if (!project.logs) project.logs = [];
     project.logs.unshift({
       id: generateId('l-'),
@@ -229,7 +225,6 @@
     renderFeatures(project);
     renderTimeline(project);
 
-    // 3. Sincronizar UI del modal si estuviera abierto
     const modalTesting = document.getElementById('modal-testing');
     if (modalTesting.open && currentTestingFeatureId === feat.id) {
       document.getElementById('testing-locked-banner').hidden = true;
@@ -496,7 +491,7 @@
         <div class="timeline-entry">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="timeline-date">${log.date}</span>
-            <button type="button" class="btn-danger-ghost" data-action="delete-log" data-log-id="${log.id}">✕</button>
+            <button type="button" class="btn-danger-ghost" data-action="delete-log" data-log-id="${log.id}" title="Eliminar avance">✕</button>
           </div>
           <div class="timeline-content">${escapeHtml(log.text)}</div>
         </div>
@@ -505,6 +500,16 @@
     });
   }
 
+  function deleteNoteById(noteId) {
+    const project = getCurrentProject();
+    if (project && project.notes) {
+      project.notes = project.notes.filter(n => n.id !== noteId);
+      saveProjects(projects);
+      renderNotesPreviews(project);
+    }
+  }
+
+  // HOMOLOGACIÓN: La nota utiliza exactamente la misma estructura visual que timeline-entry
   function renderNotesPreviews(project) {
     const container = document.getElementById('notes-container');
     container.innerHTML = '';
@@ -519,14 +524,34 @@
       const card = document.createElement('div');
       card.className = `note-preview-card ${note.important ? 'note-important' : ''}`;
       card.dataset.noteId = note.id;
+
       card.innerHTML = `
-        <div class="note-preview-text">${escapeHtml(note.text)}</div>
-        <div class="note-preview-footer">
-          <span>${note.date || 'Nota'}</span>
-          ${note.important ? `<span class="note-important-badge">Importante</span>` : ''}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+          <span class="timeline-date">${note.date || 'Nota'}</span>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            ${note.important ? `<span class="note-important-badge">★ Importante</span>` : ''}
+            <button type="button" class="note-quick-delete-btn" data-action="delete-note-quick" title="Eliminar nota">✕</button>
+          </div>
         </div>
+        <div class="timeline-content">${escapeHtml(note.text)}</div>
       `;
-      card.addEventListener('click', () => openNoteModal(note.id));
+
+      card.addEventListener('click', async (e) => {
+        if (e.target.closest('[data-action="delete-note-quick"]')) {
+          e.stopPropagation();
+          const confirmed = await showConfirm({
+            title: 'Eliminar Nota',
+            message: '¿Estás seguro de que deseas eliminar esta nota?',
+            confirmText: 'Eliminar'
+          });
+          if (confirmed) {
+            deleteNoteById(note.id);
+          }
+          return;
+        }
+        openNoteModal(note.id);
+      });
+
       container.appendChild(card);
     });
   }
@@ -840,15 +865,21 @@
   });
   document.getElementById('btn-back-dashboard').addEventListener('click', showDashboard);
 
-  document.getElementById('btn-delete-project').addEventListener('click', () => {
-    if (confirm('¿Eliminar este proyecto?')) {
+  // Eliminación de proyecto con modal
+  document.getElementById('btn-delete-project').addEventListener('click', async () => {
+    const confirmed = await showConfirm({
+      title: 'Eliminar Proyecto',
+      message: '¿Estás seguro de que deseas eliminar este proyecto y todos sus avances?',
+      confirmText: 'Eliminar proyecto'
+    });
+
+    if (confirmed) {
       projects = projects.filter(p => p.id !== currentProjectId);
       saveProjects(projects);
       showDashboard();
     }
   });
 
-  // Toggles para desplegar / ocultar listas de funcionalidades
   document.getElementById('btn-toggle-pending').addEventListener('click', () => {
     isPendingListCollapsed = !isPendingListCollapsed;
     updateSubgroupTogglesUI();
@@ -908,17 +939,25 @@
     document.getElementById('import-file-input').click();
   });
 
+  // Importación con modal de confirmación y aviso
   document.getElementById('import-file-input').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
         const imported = JSON.parse(evt.target.result);
-        if (!Array.isArray(imported)) throw new Error('Estructura inválida.');
+        if (!Array.isArray(imported)) throw new Error('El archivo no contiene una lista de proyectos válida.');
 
-        if (confirm('¿Deseas REEMPLAZAR la lista de proyectos actual? Cancela para COMBINARLOS.')) {
+        const shouldReplace = await showConfirm({
+          title: 'Importar Proyectos',
+          message: '¿Deseas REEMPLAZAR la lista de proyectos actual?\n\nSi seleccionas Cancelar, los proyectos importados se COMBINARÁN con los actuales.',
+          confirmText: 'Reemplazar',
+          danger: false
+        });
+
+        if (shouldReplace) {
           projects = imported;
         } else {
           const existingIds = new Set(projects.map(p => p.id));
@@ -930,9 +969,9 @@
         saveProjects(projects);
         renderDashboard();
         settingsDrawer.classList.remove('open');
-        alert('Proyectos importados con éxito.');
+        await showAlert({ title: 'Importación Exitosa', message: 'Los proyectos se importaron correctamente.' });
       } catch (err) {
-        alert('Error importando archivo: ' + err.message);
+        await showAlert({ title: 'Error de Importación', message: 'No se pudo importar el archivo: ' + err.message });
       }
     };
     reader.readAsText(file);
@@ -1027,15 +1066,16 @@
   });
   document.getElementById('btn-save-note').addEventListener('click', saveCurrentNote);
   document.getElementById('btn-cancel-note').addEventListener('click', () => document.getElementById('modal-note').close());
-  document.getElementById('btn-delete-note').addEventListener('click', () => {
+
+  document.getElementById('btn-delete-note').addEventListener('click', async () => {
     if (!editingNoteId) return;
-    if (confirm('¿Eliminar nota?')) {
-      const project = getCurrentProject();
-      if (project && project.notes) {
-        project.notes = project.notes.filter(n => n.id !== editingNoteId);
-        saveProjects(projects);
-        renderNotesPreviews(project);
-      }
+    const confirmed = await showConfirm({
+      title: 'Eliminar Nota',
+      message: '¿Deseas eliminar permanentemente esta nota?',
+      confirmText: 'Eliminar nota'
+    });
+    if (confirmed) {
+      deleteNoteById(editingNoteId);
       document.getElementById('modal-note').close();
     }
   });
@@ -1073,7 +1113,7 @@
     }
   });
 
-  document.getElementById('panel-features').addEventListener('click', (e) => {
+  document.getElementById('panel-features').addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
     if (!target) return;
 
@@ -1092,7 +1132,7 @@
         if (!feat) return;
         const eligibility = checkFeatureCompletionEligibility(feat);
         if (!eligibility.eligible) {
-          alert(eligibility.reason);
+          await showAlert({ title: 'No es posible completar', message: eligibility.reason });
           return;
         }
         feat.created = true;
@@ -1106,18 +1146,25 @@
         renderTimeline(project);
         break;
 
-      // REAPERTURA DESDE EL PANEL PRINCIPAL: Reactiva testing y publica en el hilo de avances
       case 'unmark-feature':
         if (feat) {
           reopenTesting(feat, project, `Reapertura: ${feat.name} [Testing reactivado]`);
         }
         break;
 
-      case 'delete-feature':
-        project.features = project.features.filter(f => f.id !== featId);
-        saveProjects(projects);
-        renderFeatures(project);
+      case 'delete-feature': {
+        const confirmed = await showConfirm({
+          title: 'Eliminar Funcionalidad',
+          message: `¿Deseas eliminar la funcionalidad "${feat ? feat.name : ''}" y todos sus subhilos de prueba?`,
+          confirmText: 'Eliminar'
+        });
+        if (confirmed) {
+          project.features = project.features.filter(f => f.id !== featId);
+          saveProjects(projects);
+          renderFeatures(project);
+        }
         break;
+      }
 
       case 'open-subthread': {
         const subtaskItem = e.target.closest('[data-subtask-id]');
@@ -1128,17 +1175,24 @@
       case 'delete-subtask': {
         const subtaskItem = e.target.closest('[data-subtask-id]');
         if (subtaskItem && feat) {
-          feat.subtasks = feat.subtasks.filter(s => s.id !== subtaskItem.dataset.subtaskId);
-          recalculateTestingStatus(feat);
-          saveProjects(projects);
-          renderFeatures(project);
+          const confirmed = await showConfirm({
+            title: 'Eliminar Subtarea',
+            message: '¿Deseas eliminar esta subtarea y su historial de pruebas asociado?',
+            confirmText: 'Eliminar'
+          });
+          if (confirmed) {
+            feat.subtasks = feat.subtasks.filter(s => s.id !== subtaskItem.dataset.subtaskId);
+            recalculateTestingStatus(feat);
+            saveProjects(projects);
+            renderFeatures(project);
+          }
         }
         break;
       }
     }
   });
 
-  document.getElementById('panel-features').addEventListener('change', (e) => {
+  document.getElementById('panel-features').addEventListener('change', async (e) => {
     if (e.target.dataset.action === 'toggle-subtask') {
       const featItem = e.target.closest('[data-feature-id]');
       const subtaskItem = e.target.closest('[data-subtask-id]');
@@ -1151,7 +1205,7 @@
       const st = feat.subtasks.find(s => s.id === subtaskItem.dataset.subtaskId);
       if (st) {
         if (!canCheckSubtask(feat, st)) {
-          alert(getSubtaskDisabledReason(feat, st));
+          await showAlert({ title: 'Subtarea bloqueada', message: getSubtaskDisabledReason(feat, st) });
           e.target.checked = st.done;
           return;
         }
@@ -1189,14 +1243,22 @@
     }
   });
 
-  document.getElementById('timeline-container').addEventListener('click', (e) => {
+  // Eliminación de avance del timeline con modal de confirmación
+  document.getElementById('timeline-container').addEventListener('click', async (e) => {
     if (e.target.dataset.action === 'delete-log') {
       const logId = e.target.dataset.logId;
       const project = getCurrentProject();
       if (project && project.logs) {
-        project.logs = project.logs.filter(l => l.id !== logId);
-        saveProjects(projects);
-        renderTimeline(project);
+        const confirmed = await showConfirm({
+          title: 'Eliminar Avance',
+          message: '¿Estás seguro de que deseas eliminar este registro del historial de avances?',
+          confirmText: 'Eliminar avance'
+        });
+        if (confirmed) {
+          project.logs = project.logs.filter(l => l.id !== logId);
+          saveProjects(projects);
+          renderTimeline(project);
+        }
       }
     }
   });
@@ -1240,7 +1302,6 @@
     currentNoteIsImportant = false;
   });
 
-  // Formulario de testing
   document.getElementById('subthread-form-box').addEventListener('submit', (e) => {
     e.preventDefault();
     const project = getCurrentProject();
@@ -1344,7 +1405,6 @@
     renderFeatures(project);
   });
 
-  // Finalizar testing en el Hilo General
   document.getElementById('btn-finalize-general').addEventListener('click', () => {
     const project = getCurrentProject();
     if (!project) return;
@@ -1372,7 +1432,7 @@
     notesInput.value = '';
   });
 
-  document.getElementById('test-timeline-list').addEventListener('click', (e) => {
+  document.getElementById('test-timeline-list').addEventListener('click', async (e) => {
     const target = e.target.closest('[data-action]');
     if (!target) return;
 
@@ -1406,6 +1466,13 @@
     if (target.dataset.action === 'delete-thread-entry') {
       const entryIdx = st.thread.findIndex(item => item.id === entryId);
       if (entryIdx === -1) return;
+
+      const confirmed = await showConfirm({
+        title: 'Eliminar Registro de Prueba',
+        message: '¿Deseas eliminar este registro de prueba del subhilo?',
+        confirmText: 'Eliminar'
+      });
+      if (!confirmed) return;
 
       const deletedEntry = st.thread[entryIdx];
       st.thread.splice(entryIdx, 1);
