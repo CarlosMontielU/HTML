@@ -125,6 +125,8 @@
   }
 
   function initNoteEvents(getProjectFn, onSaveRequired) {
+    const modal = document.getElementById('modal-note');
+
     document.getElementById('btn-add-note').addEventListener('click', () => {
       const p = getProjectFn();
       if (p) openNoteModal(p, null);
@@ -140,7 +142,7 @@
     });
 
     document.getElementById('btn-cancel-note').addEventListener('click', () => {
-      document.getElementById('modal-note').close();
+      modal.close();
     });
 
     document.getElementById('btn-delete-note').addEventListener('click', async () => {
@@ -152,7 +154,7 @@
       });
       if (confirmed) {
         deleteNote(getProjectFn(), editingNoteId, onSaveRequired);
-        document.getElementById('modal-note').close();
+        modal.close();
       }
     });
 
@@ -163,7 +165,8 @@
       }
     });
 
-    document.getElementById('modal-note').addEventListener('close', () => {
+    // Se dispara tanto al pulsar Escape como al usar modal.close()
+    modal.addEventListener('close', () => {
       editingNoteId = null;
       currentNoteIsImportant = false;
     });

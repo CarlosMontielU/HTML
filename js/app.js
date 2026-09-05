@@ -221,6 +221,16 @@
     reader.readAsText(file);
   });
 
+  // Manejador global para la tecla Escape en componentes que no son <dialog> (ej. Drawer)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (settingsDrawer.classList.contains('open')) {
+        settingsDrawer.classList.remove('open');
+        settingsDrawer.setAttribute('aria-hidden', 'true');
+      }
+    }
+  });
+
   // Inicializar sub-módulos de eventos
   projectDetailUI.initProjectDetailEvents({
     getProject: getCurrentProject,

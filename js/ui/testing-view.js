@@ -275,7 +275,11 @@
   }
 
   function initTestingEvents({ getProject, onSaveAndRenderFeatures }) {
-    const handleClose = () => {
+    const modalTesting = document.getElementById('modal-testing');
+
+    // Manejador centralizado en el evento nativo 'close'
+    // Se ejecuta al pulsar Escape, cerrar por botón o por API modalTesting.close()
+    modalTesting.addEventListener('close', () => {
       cancelEditThreadEntry();
       const project = getProject();
       if (project && currentTestingFeatureId) {
@@ -285,12 +289,18 @@
           onSaveAndRenderFeatures();
         }
       }
-      const modalTesting = document.getElementById('modal-testing');
-      if (modalTesting.open) modalTesting.close();
-    };
+      currentTestingFeatureId = null;
+    });
 
-    document.getElementById('btn-close-testing').addEventListener('click', handleClose);
-    document.getElementById('btn-done-testing').addEventListener('click', handleClose);
+    // Los botones simplemente cierran el modal y delegan en el evento 'close'
+    document.getElementById('btn-close-testing').addEventListener('click', () => {
+      modalTesting.close();
+    });
+
+    document.getElementById('btn-done-testing').addEventListener('click', () => {
+      modalTesting.close();
+    });
+
     document.getElementById('btn-cancel-edit-thread').addEventListener('click', cancelEditThreadEntry);
 
     const triggerReopen = () => {
@@ -303,8 +313,6 @@
     document.getElementById('btn-reopen-testing-from-modal').addEventListener('click', triggerReopen);
     document.getElementById('btn-reopen-general').addEventListener('click', triggerReopen);
     document.getElementById('btn-reopen-from-subthread').addEventListener('click', triggerReopen);
-
-    document.getElementById('modal-testing').addEventListener('close', handleClose);
 
     document.getElementById('subthread-form-box').addEventListener('submit', (e) => {
       e.preventDefault();
