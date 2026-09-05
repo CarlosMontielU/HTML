@@ -1,180 +1,340 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page Moderna</title>
-    <style>
-        /* Variables de color para fácil edición */
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e293b;
-            --accent-color: #3b82f6;
-            --bg-light: #f8fafc;
-            --text-dark: #0f172a;
-            --text-light: #64748b;
-        }
-
-        /* Estilos Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        /* Navegación */
-        header {
-            background-color: white;
-            padding: 1.5rem 10%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--secondary-color);
-            margin-left: 20px;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 100px 10%;
-            text-align: center;
-            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: var(--secondary-color);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: transform 0.2s, background 0.3s;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-
-        /* Grid de Servicios */
-        .services {
-            padding: 80px 10%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: scale 0.3s;
-        }
-
-        .card:hover {
-            scale: 1.03;
-        }
-
-        .card h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--secondary-color);
-            color: white;
-            text-align: center;
-            padding: 40px 10%;
-            margin-top: 50px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            header { flex-direction: column; gap: 15px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playground</title>
+  
+  <!-- Hojas de estilo desacopladas -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
 </head>
 <body>
 
-    <header>
-        <div class="logo">MiBrand</div>
-        <nav>
-            <a href="#">Inicio</a>
-            <a href="#servicios">Servicios</a>
-            <a href="#">Proyectos</a>
-            <a href="#" class="btn" style="padding: 8px 15px; font-size: 0.9rem;">Contacto</a>
-        </nav>
-    </header>
+  <canvas id="space-canvas" aria-hidden="true"></canvas>
 
-    <main>
-        <section class="hero">
-            <h1>Crea soluciones increíbles</h1>
-            <p>Diseñamos experiencias digitales que ayudan a tu negocio a crecer en el mundo moderno.</p>
-            <a href="#servicios" class="btn">Empezar ahora</a>
-        </section>
+  <header class="app-header">
+    <div class="header-content">
+      <h1>Playground</h1>
+    </div>
+    <button type="button" class="btn btn-secondary" id="btn-open-settings">Configuración</button>
+  </header>
 
-        <section class="services" id="servicios">
-            <div class="card">
-                <h3>Diseño Web</h3>
-                <p>Interfaces intuitivas y atractivas adaptadas a tu identidad de marca.</p>
+  <main class="app-main">
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active" aria-label="Tablero de proyectos">
+      <div class="projects-header">
+        <h2>Proyectos</h2>
+        <button type="button" class="btn" id="btn-create-project">Nuevo Proyecto</button>
+      </div>
+      <div id="projects-container" class="grid-projects"></div>
+    </section>
+
+    <!-- DETALLE DEL PROYECTO -->
+    <section id="view-project" class="view" aria-label="Detalle del proyecto" hidden>
+      <nav class="detail-nav" aria-label="Navegación del proyecto">
+        <button type="button" class="btn btn-secondary" id="btn-back-dashboard">←</button>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" class="btn btn-secondary" id="btn-edit-project">Editar</button>
+          <button type="button" class="btn-danger-ghost" id="btn-delete-project">Eliminar proyecto</button>
+        </div>
+      </nav>
+
+      <section class="project-hero" id="hero-detail"></section>
+
+      <!-- WORKSPACE ACOPLADO -->
+      <section class="docked-workspace" id="split-workspace">
+        <!-- PANEL 1: FUNCIONALIDADES -->
+        <div class="docked-panel" id="panel-features">
+          <div class="section-title">Funcionalidades</div>
+
+          <form id="form-add-feature" class="inline-form">
+            <input type="text" id="feature-input" placeholder="Añadir funcionalidad..." required>
+            <button type="submit" class="btn btn-secondary" aria-label="Agregar">+</button>
+          </form>
+
+          <!-- Subgrupo Pendientes (Desplegable) -->
+          <div class="features-subgroup">
+            <button type="button" class="subgroup-header-btn" id="btn-toggle-pending" aria-expanded="true" title="Desplegar u ocultar pendientes">
+              <span class="subgroup-arrow">▼</span>
+              <span class="subgroup-title">
+                <span>Pendientes</span>
+                <span id="pending-count" class="accent-text"></span>
+              </span>
+            </button>
+            <ul class="feature-list" id="pending-features-list"></ul>
+          </div>
+
+          <!-- Subgrupo Creadas / Realizadas (Desplegable) -->
+          <div class="features-subgroup">
+            <button type="button" class="subgroup-header-btn" id="btn-toggle-created" aria-expanded="true" title="Desplegar u ocultar creadas">
+              <span class="subgroup-arrow">▼</span>
+              <span class="subgroup-title">
+                <span>Creadas</span>
+                <span id="created-count" class="accent-text"></span>
+              </span>
+            </button>
+            <ul class="feature-list" id="created-features-list"></ul>
+          </div>
+        </div>
+
+        <!-- DIVISOR 1 -->
+        <div class="split-gutter" id="gutter-1" role="separator" aria-orientation="vertical" tabindex="0" title="Arrastrar para redimensionar"></div>
+
+        <!-- PANEL 2: HILO DE AVANCES -->
+        <div class="docked-panel" id="panel-timeline">
+          <div class="section-title">Avances</div>
+          <form id="form-add-log" class="timeline-form">
+            <textarea id="log-input" rows="2" placeholder="Registrar avance o cambio..." required></textarea>
+            <div class="form-actions-right">
+              <button type="submit" class="btn btn-secondary" aria-label="Publicar avance">+</button>
             </div>
-            <div class="card">
-                <h3>Desarrollo</h3>
-                <p>Código limpio, optimizado y escalable para cualquier tipo de proyecto.</p>
-            </div>
-            <div class="card">
-                <h3>Marketing</h3>
-                <p>Estrategias digitales para posicionar tu sitio en los primeros lugares.</p>
-            </div>
-        </section>
-    </main>
+          </form>
+          <div id="timeline-container" class="timeline"></div>
+        </div>
 
-    <footer>
-        <p>&copy; 2026 MiBrand Studio. Todos los derechos reservados.</p>
-    </footer>
+        <!-- DIVISOR 2 -->
+        <div class="split-gutter" id="gutter-2" role="separator" aria-orientation="vertical" tabindex="0" title="Arrastrar para redimensionar"></div>
 
+        <!-- PANEL 3: NOTAS -->
+        <div class="docked-panel" id="panel-notes">
+          <div class="section-title">
+            <span>Notas</span>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-add-note" aria-label="Añadir nota">+</button>
+          </div>
+          <div id="notes-container" class="notes-grid"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- PANEL DE CONFIGURACIÓN (DRAWER) -->
+  <aside id="settings-drawer" class="drawer" aria-labelledby="settings-heading" aria-hidden="true">
+    <div class="settings-header">
+      <h2 id="settings-heading">Configuración</h2>
+      <button type="button" class="btn-danger-ghost" id="btn-close-settings">Cerrar</button>
+    </div>
+
+    <div class="settings-body">
+      <section>
+        <h3 class="settings-section-title">Tema (12 colores)</h3>
+        <div class="theme-grid" id="theme-buttons"></div>
+      </section>
+
+      <section>
+        <h3 class="settings-section-title">Datos & Respaldo</h3>
+        <div class="vertical-button-group">
+          <button type="button" class="btn btn-secondary btn-full" id="btn-export-data">
+            Exportar proyectos (JSON)
+          </button>
+          <button type="button" class="btn btn-secondary btn-full" id="btn-trigger-import">
+            Importar proyectos (JSON)
+          </button>
+          <input type="file" id="import-file-input" accept=".json" class="visually-hidden">
+        </div>
+      </section>
+
+      <section>
+        <h3 class="settings-section-title">Contenedores</h3>
+        <div class="control-slider-group">
+          <div class="control-slider-header">
+            <span>Opacidad</span>
+            <span id="label-opacity">72%</span>
+          </div>
+          <input type="range" id="slider-opacity" min="0.15" max="0.95" step="0.01" value="0.72">
+        </div>
+      </section>
+
+      <section>
+        <h3 class="settings-section-title">Espacio de fondo</h3>
+        <div class="control-slider-group">
+          <div class="control-slider-header">
+            <span>Cantidad de estrellas</span>
+            <span id="label-star-density">1.0x</span>
+          </div>
+          <input type="range" id="slider-star-density" min="0.3" max="2.5" step="0.1" value="1.0">
+        </div>
+        <div class="control-slider-group">
+          <div class="control-slider-header">
+            <span>Velocidad</span>
+            <span id="label-star-speed">1.0x</span>
+          </div>
+          <input type="range" id="slider-star-speed" min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-slider-group">
+          <div class="control-slider-header">
+            <span>Escala</span>
+            <span id="label-star-size">1.0x</span>
+          </div>
+          <input type="range" id="slider-star-size" min="0.5" max="2.2" step="0.1" value="1.0">
+        </div>
+      </section>
+
+      <section>
+        <button type="button" class="btn btn-secondary btn-full" id="btn-reset-settings">
+          Restaurar valores
+        </button>
+      </section>
+    </div>
+  </aside>
+
+  <!-- MODAL: CREAR / EDITAR PROYECTO -->
+  <dialog class="app-modal" id="modal-project">
+    <div class="modal-card">
+      <h3 id="modal-project-title">Nuevo Proyecto</h3>
+      <form id="form-create-project">
+        <div class="form-group">
+          <label for="p-name">Nombre</label>
+          <input type="text" id="p-name" placeholder="Ej: Motor de física 2D" required>
+        </div>
+        <div class="form-group">
+          <label for="p-desc">Descripción</label>
+          <textarea id="p-desc" rows="2" placeholder="Breve resumen del objetivo..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="p-tech">Tecnologías (separadas por coma)</label>
+          <input type="text" id="p-tech" placeholder="Rust, WebAssembly, Canvas...">
+        </div>
+        <footer class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-project">Cancelar</button>
+          <button type="submit" class="btn" id="btn-submit-project">Crear</button>
+        </footer>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: NOTAS -->
+  <dialog class="app-modal" id="modal-note">
+    <div class="modal-card note-panel-card">
+      <header class="modal-header">
+        <h3 id="note-modal-title">Nota</h3>
+        <div class="modal-header-actions">
+          <button type="button" id="btn-note-important" class="btn btn-secondary btn-sm">Importante</button>
+          <span class="shortcut-tip">Esc para cerrar · Ctrl + Enter para guardar</span>
+        </div>
+      </header>
+      <textarea id="note-modal-textarea" class="note-textarea" placeholder="Escribe notas o comandos..."></textarea>
+      <footer class="modal-actions space-between">
+        <button type="button" id="btn-delete-note" class="btn-danger-ghost" hidden>Eliminar nota</button>
+        <div class="actions-right">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-note">Cerrar</button>
+          <button type="button" class="btn" id="btn-save-note">Guardar</button>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- MODAL: TESTING & SUBHILOS -->
+  <dialog class="app-modal" id="modal-testing">
+    <div class="modal-card testing-panel-card">
+      <header class="modal-header">
+        <div>
+          <h3>Testing & Subhilos</h3>
+          <p id="testing-modal-subtitle" class="text-muted"></p>
+        </div>
+        <button type="button" class="btn-danger-ghost" id="btn-close-testing" aria-label="Cerrar modal">✕</button>
+      </header>
+
+      <!-- Banner si la función está completada -->
+      <div id="testing-locked-banner" class="completed-lock-banner" hidden>
+        <span>🔒 La función está completada (subtareas bloqueadas).</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-reopen-testing-from-modal">
+          Reabrir función y desbloquear
+        </button>
+      </div>
+
+      <!-- Barra de navegación de Subhilos -->
+      <div class="subthread-nav-tabs" id="subthread-tabs-bar" role="tablist"></div>
+
+      <!-- Banner de bloqueo para subhilos cuando el testing está finalizado -->
+      <div id="subthread-locked-banner" class="completed-lock-banner" hidden>
+        <span>🔒 Testing cerrado en el hilo principal. Registro de pruebas deshabilitado.</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-reopen-from-subthread">
+          🔄 Reabrir testing
+        </button>
+      </div>
+
+      <!-- FORMULARIO DE SUBHILO ESPECÍFICO -->
+      <form id="subthread-form-box" class="test-thread-form" hidden>
+        <div class="form-row space-between">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span id="active-subthread-label" class="subthread-title-highlight"></span>
+            <span id="thread-form-mode-badge" class="test-pill pill-changes" hidden>✏️ Editando prueba</span>
+          </div>
+          <span id="active-subthread-status-badge" class="test-pill pill-note">⚪ Sin pruebas</span>
+        </div>
+
+        <div class="form-row">
+          <select id="thread-event-type" class="flex-1" required>
+            <option value="started">▶️ Prueba iniciada</option>
+            <option value="passed">✅ Prueba exitosa (Superada)</option>
+            <option value="failed">❌ Prueba fallida</option>
+            <option value="changes">🛠️ Cambios / Correcciones</option>
+            <option value="note">💬 Nota / Observación</option>
+          </select>
+          <input type="text" id="thread-title-input" class="flex-2" placeholder="Título / Resumen de la prueba..." required>
+        </div>
+
+        <textarea id="thread-notes-input" rows="2" placeholder="Detalles de la prueba, resultados obtenidos o pasos para reproducir..."></textarea>
+
+        <div class="form-actions-right" style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+          <button type="button" id="btn-cancel-edit-thread" class="btn btn-secondary btn-sm" hidden>Cancelar edición</button>
+          <button type="submit" id="btn-submit-thread" class="btn btn-sm">Publicar en subhilo</button>
+        </div>
+      </form>
+
+      <!-- HILO GENERAL CONSOLIDADO -->
+      <section id="general-thread-panel" class="general-thread-panel" hidden>
+        <div class="form-row space-between">
+          <span class="subthread-title-highlight">🌐 Hilo General Consolidado</span>
+          <span id="general-status-badge" class="test-pill pill-note">En evaluación</span>
+        </div>
+        <p class="panel-description">
+          Este hilo se alimenta automáticamente de cada subhilo. No admite pruebas manuales directas; solo se declara la función como finalizada cuando todas las subtareas hayan superado sus pruebas.
+        </p>
+
+        <div class="subtasks-status-list" id="general-subtasks-overview"></div>
+
+        <div id="general-finalize-box" class="finalize-box">
+          <div class="inline-form" id="general-finalize-form">
+            <input type="text" id="general-finalize-notes" placeholder="Notas finales de aprobación / criterios cumplidos...">
+            <button type="button" id="btn-finalize-general" class="btn btn-theme-soft btn-sm">
+              🏁 Finalizar testing de la función
+            </button>
+          </div>
+          <div id="general-reopen-box" style="display: flex; justify-content: space-between; align-items: center;" hidden>
+            <span style="font-size: 0.74rem; color: var(--text-muted);">El testing se encuentra finalizado y aprobado.</span>
+            <button type="button" id="btn-reopen-general" class="btn btn-secondary btn-sm">
+              🔄 Reabrir testing
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lista del Historial Activo -->
+      <section class="test-timeline-container">
+        <div class="subgroup-title">
+          <span id="subthread-history-title">Historial</span>
+          <span id="thread-entries-count" class="accent-text"></span>
+        </div>
+        <div id="test-timeline-list" class="test-timeline"></div>
+      </section>
+
+      <footer class="modal-actions border-top">
+        <button type="button" class="btn btn-secondary" id="btn-done-testing">Listo</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- Scripts modulares -->
+  <script defer src="js/constants.js"></script>
+  <script defer src="js/utils.js"></script>
+  <script defer src="js/storage.js"></script>
+  <script defer src="js/space-background.js"></script>
+  <script defer src="js/splitter.js"></script>
+  <script defer src="js/theme.js"></script>
+  <script defer src="js/app.js"></script>
 </body>
 </html>

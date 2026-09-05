@@ -1,0 +1,26 @@
+:root {
+  --bg: #05070e;
+  --card-rgb: 18, 25, 41;
+  --card-opacity: 0.72;
+  --card-bg: rgba(var(--card-rgb), var(--card-opacity));
+  --card-hover: rgba(28, 38, 62, 0.85);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(255, 255, 255, 0.25);
+  --text: #f8fafc;
+  --text-muted: #8492a6;
+  
+  --primary: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --accent: #38bdf8;
+  --accent-tag: rgba(56, 189, 248, 0.08);
+  --accent-tag-border: rgba(56, 189, 248, 0.2);
+
+  --theme-soft-bg: rgba(139, 92, 246, 0.12);
+  --theme-soft-border: rgba(139, 92, 246, 0.3);
+  --theme-soft-text: #38bdf8;
+  
+  --danger: #f43f5e;
+  --warning: #f59e0b;
+  --success: #10b981;
+  --radius: 15px;
+}

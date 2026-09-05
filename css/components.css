@@ -1,0 +1,180 @@
+/* Botones */
+.btn {
+  background-color: var(--primary);
+  color: #ffffff !important;
+  border: 1px solid transparent;
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+.btn:hover:not(:disabled) { background-color: var(--primary-hover); }
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text) !important;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-focus);
+}
+
+.btn-sm {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-theme-soft {
+  background: var(--theme-soft-bg);
+  color: var(--theme-soft-text) !important;
+  border: 1px solid var(--theme-soft-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+.btn-theme-soft:hover:not(:disabled) {
+  background: var(--theme-soft-border);
+  border-color: var(--primary);
+}
+
+.btn:disabled, .btn-theme-soft:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: auto;
+  box-shadow: none;
+  filter: grayscale(0.5);
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-muted) !important;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+.btn-danger-ghost:hover { color: var(--danger) !important; }
+
+/* Inputs, Textareas y Selects */
+input, textarea, select {
+  width: 100%;
+  background: rgba(8, 11, 20, 0.85);
+  border: 1px solid var(--border);
+  color: var(--text) !important;
+  padding: 0.55rem 0.75rem;
+  border-radius: 7px;
+  outline: none;
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--primary); }
+
+select option {
+  background-color: #0c101c !important;
+  color: #f8fafc !important;
+}
+
+.form-group {
+  margin-bottom: 0.7rem;
+}
+.form-group label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.inline-form {
+  display: flex;
+  gap: 0.4rem;
+}
+.form-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.form-actions-right {
+  display: flex;
+  justify-content: flex-end;
+}
+.flex-1 { flex: 1; min-width: 170px; }
+.flex-2 { flex: 2; min-width: 200px; }
+.space-between { justify-content: space-between; align-items: center; }
+.border-top { border-top: 1px solid var(--border); padding-top: 0.6rem; }
+
+/* Modales Nativos (<dialog>) - Sin scrolls internos, crecen naturalmente */
+.app-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  border: none;
+  background: transparent;
+  padding: 2.5rem 1.2rem;
+  max-width: 100vw;
+  color: var(--text) !important;
+  overflow: visible; /* Elimina scrollbar del modal */
+}
+.app-modal::backdrop {
+  background: rgba(3, 5, 12, 0.85);
+  backdrop-filter: blur(8px);
+}
+.app-modal[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-card {
+  background: rgba(14, 19, 32, 0.98);
+  border: 1px solid var(--border-focus);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  min-width: 70vw;
+  width: 100%;
+  color: var(--text) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  overflow: visible;
+  height: auto;
+}
+.modal-card h3 {
+  color: var(--text) !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+/* Pills & Tags */
+.tags-container { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.3rem 0; }
+.tag-pill {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  background: var(--accent-tag);
+  color: var(--accent) !important;
+  border: 1px solid var(--accent-tag-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: normal;
+  word-break: break-word;
+}
+.tag-pill .remove-tag { cursor: pointer; color: var(--text-muted); font-size: 0.8rem; }
+.tag-pill .remove-tag:hover { color: var(--danger) !important; }
+
