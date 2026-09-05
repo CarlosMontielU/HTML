@@ -52,7 +52,7 @@
 
           <form id="form-add-feature" class="inline-form">
             <input type="text" id="feature-input" placeholder="Añadir funcionalidad..." required>
-            <button type="submit" class="btn" aria-label="Agregar">+</button>
+            <button type="submit" class="btn btn-secondary" aria-label="Agregar">+</button>
           </form>
 
           <!-- Subgrupo Pendientes (Desplegable) -->
@@ -89,7 +89,7 @@
           <form id="form-add-log" class="timeline-form">
             <textarea id="log-input" rows="2" placeholder="Registrar avance o cambio..." required></textarea>
             <div class="form-actions-right">
-              <button type="submit" class="btn" aria-label="Publicar avance">+</button>
+              <button type="submit" class="btn btn-secondary" aria-label="Publicar avance">+</button>
             </div>
           </form>
           <div id="timeline-container" class="timeline"></div>
@@ -351,13 +351,27 @@
     </div>
   </dialog>
 
-  <!-- Scripts modulares -->
-  <script defer src="js/constants.js"></script>
-  <script defer src="js/utils.js"></script>
-  <script defer src="js/storage.js"></script>
-  <script defer src="js/space-background.js"></script>
-  <script defer src="js/splitter.js"></script>
-  <script defer src="js/theme.js"></script>
-  <script defer src="js/app.js"></script>
+<!-- 1. Constantes y configuración SIEMPRE primero -->
+<script src="js/constants.js"></script>   <!-- O como se llame tu archivo de constantes -->
+
+<!-- 2. Utilidades y Almacenamiento -->
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+
+<!-- 3. Tema y Fondo (dependen de constants y utils) -->
+<script src="js/theme.js"></script>
+<script src="js/space-background.js"></script>
+<!-- Pon aquí el nombre REAL de tu splitter si existe -->
+<script src="js/splitter.js"></script> 
+
+<!-- 4. Lógica y Vistas modulares -->
+<script src="js/logic/testing-logic.js"></script>
+<script src="js/ui/dashboard.js"></script>
+<script src="js/ui/notes.js"></script>
+<script src="js/ui/project-detail.js"></script>
+<script src="js/ui/testing-view.js"></script>
+
+<!-- 5. Orquestador final -->
+<script src="js/app.js"></script>
 </body>
 </html>
